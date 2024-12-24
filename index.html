@@ -35,11 +35,6 @@
       color: #0056b3;
     }
 
-    .ip {
-      font-size: 1.2em;
-      color: #555;
-    }
-
     .status.red {
       color: red;
     }
@@ -68,13 +63,34 @@
     li {
       font-size: 1.1em;
     }
+
+    .loading {
+      font-size: 1.2em;
+      color: #555;
+    }
+
+    .icon {
+      font-size: 2em;
+      margin-right: 10px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      body {
+        background-color: #121212;
+        color: #f5f5f5;
+      }
+
+      .status {
+        color: #80cbc4;
+      }
+    }
   </style>
 
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-VLJBNS36DX"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
+    function gtag() { dataLayer.push(arguments); }
     gtag('js', new Date());
 
     gtag('config', 'G-VLJBNS36DX');
@@ -83,12 +99,12 @@
 
 <body>
   <h1>Can You Host a VPN on Your Network?</h1>
-  <p id="checking">Checking your connection...</p>
+  <p id="checking" class="loading">Checking your connection...</p>
   <div class="result" id="result"></div>
   <div class="note" id="note"></div>
   <div class="vpn-info">
-    <p>If you need help setting up a VPN, check out our <a href="https://thewirednomad.com/vpn" target="_blank">VPN
-        setup instructions</a> or explore our <a href="https://thewirednomad.com/tiers" target="_blank">VPN setup
+    <p>If you need help setting up a VPN, check out these <a href="https://thewirednomad.com/vpn" target="_blank">VPN
+        setup instructions</a> or see these <a href="https://thewirednomad.com/tiers" target="_blank">VPN setup
         services</a>.</p>
   </div>
   <br>
@@ -96,16 +112,26 @@
   <ol>
     <li>Do I need to port forward on my home router?
       <ul>
-        <li>
-          If using a GL.iNet VPN server router plugged into an existing router: <strong>Yes</strong></li>
-        <li>
-          If using a GL.iNet VPN server router plugged into an existing modem (non-router) or if the router is in bridge mode: <strong>No</strong></li>
+        <li>If using a GL.iNet VPN server router plugged into an existing router: <strong>Yes</strong></li>
+        <li>If using a GL.iNet VPN server router plugged into an existing modem (non-router) or into a router configured in
+          bridge/passthrough mode: <strong>No</strong></li>
       </ul>
     </li>
-    <li>Check if you're behind CGNAT: Compare the IP shown on this page with the <strong>WAN</strong> IP in your router
-      admin page. If they are different, you are behind CGNAT.</li>
-    <li>Is your internet connection stable and fast enough for VPN traffic (server upload speed = VPN client download
-      speed)?</li>
+    <li>Check if you're behind CGNAT:
+      <ul>
+        <li>Compare the IP shown on this page with the <strong>WAN</strong> IP in your main router's admin page. If they are
+          different, you are behind CGNAT.</li>
+      </ul>
+      <p>
+        <em>CGNAT (Carrier-Grade NAT) is used by ISPs to share a single public IP among multiple users. If you're behind CGNAT, your VPN server will not work properly because it cannot receive inbound traffic.</em>
+      </p>
+    </li>
+    <li>Is your internet connection stable and fast enough for VPN traffic?
+      <ul>
+        <li>A minimum upload speed of <strong>20 Mbps</strong> is recommended for hosting a VPN server.</li>
+        <li>Keep in mind that the server's upload speed determines the maximum download speed for connected VPN clients.</li>
+      </ul>
+    </li>
   </ol>
 
   <script>
@@ -113,29 +139,26 @@
       try {
         const response = await fetch(`https://ipinfo.io/${ip}/json`);
         const data = await response.json();
-    
-        // Check for common mobile carrier names
+
         const mobileKeywords = ["Wireless", "Mobile", "Cellular", "Verizon", "AT&T", "T-Mobile", "Sprint"];
         if (data.org && mobileKeywords.some(keyword => data.org.includes(keyword))) {
-          return true; // Likely a cellular IP
+          return true;
         }
-    
-        // Check ASN for known mobile providers
-        const mobileASNs = ["701", "6167", "22394", "21928", "23402"]; // Verizon, AT&T, T-Mobile, Sprint
+
+        const mobileASNs = ["701", "6167", "22394", "21928", "23402"];
         if (data.asn && mobileASNs.includes(data.asn.replace("AS", ""))) {
-          return true; // Likely a cellular IP
+          return true;
         }
-    
-        // Add specific checks for Verizon 5G Home Internet and AT&T Fiber
-        const fixedLineASNs = ["7018", "20001"]; // Verizon 5G Home Internet and AT&T Fiber
+
+        const fixedLineASNs = ["7018", "20001"];
         if (data.asn && fixedLineASNs.includes(data.asn.replace("AS", ""))) {
-          return false; // It's not a cellular network, it's a fixed line (home internet)
+          return false;
         }
-    
+
       } catch (error) {
         console.error("Error checking IP info for hotspot:", error);
       }
-      return false; // Default to not cellular
+      return false;
     }
 
     async function checkPublicIP() {
@@ -166,16 +189,16 @@
         if (publicIPv4 !== "Not available") {
           const isCellular = await checkCellularIP(publicIPv4);
           if (isCellular) {
-            statusMessage = "No, you have a public IP, but it belongs to a cellular network.";
+            statusMessage = "<span class='icon'>⚠️</span>No, you have a public IP, but it belongs to a cellular network.";
             statusClass = "orange";
             noteElement.textContent = "Cellular networks typically block inbound traffic, making them unsuitable for hosting a WireGuard VPN server. Contact your carrier to confirm restrictions or inquire about dedicated static IP options.";
           } else {
-            statusMessage = "Yes, you have a public-looking IP.";
+            statusMessage = "<span class='icon'>✔️</span>Yes, you have a public-looking IP.";
             statusClass = "green";
             noteElement.textContent = "Note: Public-looking IPs may still have restrictions by your ISP that block inbound connections.";
           }
         } else {
-          statusMessage = "Unable to determine public IP status.";
+          statusMessage = "<span class='icon'>⚠️</span>Unable to determine public IP status.";
           statusClass = "orange";
         }
 
@@ -188,7 +211,6 @@
       }
     }
 
-    // Run the check on page load
     checkPublicIP();
   </script>
 </body>
