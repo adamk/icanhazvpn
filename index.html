@@ -147,7 +147,7 @@
           } else {
             const isCellular = await checkCellularIP(publicIPv4);
             if (isCellular) {
-              statusMessage = "Yes, you have a public IP, but it belongs to a cellular network.";
+              statusMessage = "No, you have a public IP, but it belongs to a cellular network.";
               statusClass = "orange";
               noteElement.textContent = "Cellular networks typically block inbound traffic, making them unsuitable for hosting a WireGuard VPN server. Contact your carrier to confirm restrictions or inquire about dedicated static IP options.";
             } else {
