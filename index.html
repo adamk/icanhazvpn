@@ -116,8 +116,30 @@
           different, you are behind CGNAT.</li>
       </ul>
       <p>
-        <em>CGNAT (Carrier-Grade NAT) is used by ISPs to share a single public IP among multiple users. If you're behind CGNAT, your VPN server will not work properly because it cannot receive inbound traffic.</em>
+        <strong>How to find a default gateway IP address:</strong>
+        <br>
+        <strong>Windows:</strong>
+        <ul>
+          <li>Type "control panel" into the Windows search box and hit Enter.</li>
+          <li>Select Network, then Internet, and click on Network and Sharing Center.</li>
+          <li>Click on Ethernet, then Details. Finally, find your IP address listed next to the IPv4 Default Gateway.</li>
+        </ul>
+      
+        <strong>MacOS:</strong>
+        <ul>
+          <li>Click the Apple icon and select System Settings.</li>
+          <li>Select Network, then choose WiFi.</li>
+          <li>Select your network connection and click Details.</li>
+          <li>Finally, click the TCP/IP tab to find your gateway IP address listed next to Router.</li>
+        </ul>
+        <p>If you have a Netgear Router:</p>
+        <ul>
+          <li>Try typing <strong>www.routerlogin.net</strong> into your web browser to access the router's admin page.</li>
+        </ul>
       </p>
+          <p>
+            <em>CGNAT (Carrier-Grade NAT) is used by ISPs to share a single public IP among multiple users. If you're behind CGNAT, your VPN server will not work properly because it cannot receive inbound traffic.</em>
+          </p>
     </li>
     <li>Do I need to port forward on my home router?
       <ul>
