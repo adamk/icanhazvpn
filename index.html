@@ -193,7 +193,7 @@
             statusClass = "orange";
             noteElement.textContent = "Cellular networks typically block inbound traffic, making them unsuitable for hosting a WireGuard VPN server. Contact your carrier to confirm restrictions or inquire about dedicated static IP options.";
           } else {
-            statusMessage = "<span class='icon'>✔️</span>Yes, you have a public-looking IP.";
+            statusMessage = "<span class='icon'>✔️</span>Yes, you have a public-looking IP. However, see below on how to check if you're behind CGNAT";
             statusClass = "green";
             noteElement.textContent = "Note: Public-looking IPs may still have restrictions by your ISP that block inbound connections.";
           }
