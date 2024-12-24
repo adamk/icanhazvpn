@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Can I Host a VPN?</title>
+  <title>Can You Host a VPN?</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -58,24 +58,18 @@
       margin-top: 20px;
     }
   </style>
-
-  <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-VLJBNS36DX"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-VLJBNS36DX');
-</script>
-  
 </head>
 
 <body>
-  <h1>Can I host a VPN on this network?</h1>
+  <h1>Can You Host a VPN on Your Network?</h1>
   <p id="checking">Checking your connection...</p>
   <div class="result" id="result"></div>
   <div class="note" id="note"></div>
+  <div class="vpn-info">
+    <p>If you need help setting up a VPN, check out our <a href="https://thewirednomad.com/vpn" target="_blank">VPN
+        setup instructions</a> or explore our <a href="https://thewirednomad.com/tiers" target="_blank">VPN setup
+        services</a>.</p>
+  </div>
 
   <script>
     async function checkIPType(ip) {
@@ -148,12 +142,12 @@
             statusMessage = "No, you are behind a private IP (NAT).";
             statusClass = "red";
           } else if (isCGNAT) {
-            statusMessage = "No, you are behind CGNAT. You need a public IP.";
+            statusMessage = "No, you are behind CGNAT.";
             statusClass = "red";
           } else {
             const isCellular = await checkCellularIP(publicIPv4);
             if (isCellular) {
-              statusMessage = "No, you have a public IP, but it belongs to a cellular network.";
+              statusMessage = "Yes, you have a public IP, but it belongs to a cellular network.";
               statusClass = "orange";
               noteElement.textContent = "Cellular networks typically block inbound traffic, making them unsuitable for hosting a WireGuard VPN server. Contact your carrier to confirm restrictions or inquire about dedicated static IP options.";
             } else {
