@@ -57,18 +57,28 @@
       color: #888;
       margin-top: 20px;
     }
+
+    ol {
+      text-align: left;
+      margin-top: 30px;
+      display: inline-block;
+      text-align: left;
+    }
+
+    li {
+      font-size: 1.1em;
+    }
   </style>
 
   <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-VLJBNS36DX"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VLJBNS36DX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
 
-  gtag('config', 'G-VLJBNS36DX');
-</script>
-  
+    gtag('config', 'G-VLJBNS36DX');
+  </script>
 </head>
 
 <body>
@@ -82,23 +92,15 @@
         services</a>.</p>
   </div>
 
+  
+  <h2>VPN Hosting Checklist</h2>
+  <ol>
+    <li>Is your router configured for port forwarding and forwarding the correct VPN port?</li>
+    <li>Compare the IP shown on this page with the WAN IP in your router configuration.</li>
+    <li>Is your internet connection stable and fast enough for VPN traffic (server upload speed = VPN client download speed)?</li>
+  </ol>
+
   <script>
-    async function checkIPType(ip) {
-      if (ip.includes(":")) {
-        const isPrivateIPv6 = ip.startsWith("fc") || ip.startsWith("fe80");
-        return { isPrivate: isPrivateIPv6, isCGNAT: false };
-      }
-
-      const [first, second] = ip.split('.').map(Number);
-      const isPrivate = (
-        (first === 10) ||
-        (first === 172 && second >= 16 && second <= 31) ||
-        (first === 192 && second === 168)
-      );
-      const isCGNAT = (first === 100 && second >= 64 && second <= 127);
-      return { isPrivate, isCGNAT };
-    }
-
     async function checkCellularIP(ip) {
       try {
         const response = await fetch(`https://ipinfo.io/${ip}/json`);
@@ -154,38 +156,19 @@
         let ipMessage = `IPv4: ${publicIPv4}<br>IPv6: ${publicIPv6}`;
 
         if (publicIPv4 !== "Not available") {
-          const { isPrivate, isCGNAT } = await checkIPType(publicIPv4);
-
-          if (isPrivate) {
-            statusMessage = "No, you are behind a private IP (NAT).";
-            statusClass = "red";
-          } else if (isCGNAT) {
-            statusMessage = "No, you are behind CGNAT.";
-            statusClass = "red";
+          const isCellular = await checkCellularIP(publicIPv4);
+          if (isCellular) {
+            statusMessage = "No, you have a public IP, but it belongs to a cellular network.";
+            statusClass = "orange";
+            noteElement.textContent = "Cellular networks typically block inbound traffic, making them unsuitable for hosting a WireGuard VPN server. Contact your carrier to confirm restrictions or inquire about dedicated static IP options.";
           } else {
-            const isCellular = await checkCellularIP(publicIPv4);
-            if (isCellular) {
-              statusMessage = "No, you have a public IP, but it belongs to a cellular network.";
-              statusClass = "orange";
-              noteElement.textContent = "Cellular networks typically block inbound traffic, making them unsuitable for hosting a WireGuard VPN server. Contact your carrier to confirm restrictions or inquire about dedicated static IP options.";
-            } else {
-              statusMessage = "Yes, you have a public-looking IP.";
-              statusClass = "green";
-              noteElement.textContent = "Note: Public-looking IPs may still have restrictions by your ISP that block inbound connections.";
-            }
+            statusMessage = "Yes, you have a public-looking IP.";
+            statusClass = "green";
+            noteElement.textContent = "Note: Public-looking IPs may still have restrictions by your ISP that block inbound connections.";
           }
         } else {
-          statusMessage = "Unable to determine CGNAT or public IP status.";
+          statusMessage = "Unable to determine public IP status.";
           statusClass = "orange";
-        }
-
-        if (publicIPv6 !== "Not available") {
-          const { isPrivate } = await checkIPType(publicIPv6);
-          if (isPrivate) {
-            ipMessage += "<br>Note: Your IPv6 address is private.";
-          } else {
-            
-          }
         }
 
         document.getElementById('checking').remove();
