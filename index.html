@@ -164,26 +164,39 @@
       try {
         const response = await fetch(`https://ipinfo.io/${ip}/json`);
         const data = await response.json();
-
-        const mobileKeywords = ["Wireless", "Mobile", "Cellular", "Verizon", "AT&T", "T-Mobile", "Sprint"];
+    
+        // Known mobile carrier organization keywords
+        const mobileKeywords = ["Wireless", "Mobile", "Cellular", "Verizon", "T-Mobile", "Sprint"];
+    
+        // Specific ASN numbers for mobile networks
+        const mobileASNs = ["701", "6167", "22394", "21928", "23402"]; // Verizon, AT&T Wireless, T-Mobile, Sprint
+    
+        // Specific ASN numbers for fixed-line networks
+        const fixedLineASNs = ["7018", "20001"]; // AT&T Fiber, other fixed-line ASNs
+    
+        // Check organization name for mobile keywords
         if (data.org && mobileKeywords.some(keyword => data.org.includes(keyword))) {
-          return true;
+          // If organization contains "Fiber" or "Fixed", it's not cellular
+          if (data.org.includes("Fiber") || data.org.includes("Fixed")) {
+            return false; // Fixed-line network
+          }
+          return true; // Cellular network
         }
-
-        const mobileASNs = ["701", "6167", "22394", "21928", "23402"];
-        if (data.asn && mobileASNs.includes(data.asn.replace("AS", ""))) {
-          return true;
+    
+        // Check ASN for known mobile and fixed-line networks
+        if (data.asn) {
+          const asnNumber = data.asn.replace("AS", "");
+          if (mobileASNs.includes(asnNumber)) {
+            return true; // Cellular network
+          }
+          if (fixedLineASNs.includes(asnNumber)) {
+            return false; // Fixed-line network
+          }
         }
-
-        const fixedLineASNs = ["7018", "20001"];
-        if (data.asn && fixedLineASNs.includes(data.asn.replace("AS", ""))) {
-          return false;
-        }
-
       } catch (error) {
         console.error("Error checking IP info for hotspot:", error);
       }
-      return false;
+      return false; // Default to not cellular if uncertain
     }
 
     async function checkPublicIP() {
