@@ -227,11 +227,11 @@
         if (publicIPv4 !== "Not available") {
           const isCellular = await checkCellularIP(publicIPv4);
           if (isCellular) {
-            statusMessage = "<span class='icon'>⚠️</span>You have a public IP, but it belongs to a cellular network.";
+            statusMessage = "<span class='icon'>⚠️</span> Your IP address belongs to a cellular network. CGNAT is very likely. ";
             statusClass = "orange";
             noteElement.textContent = "Cellular networks typically block inbound traffic, making them unsuitable for hosting a WireGuard VPN server. Contact your carrier to confirm restrictions or inquire about dedicated static IP options.";
           } else {
-            statusMessage = "<span class='icon'>✔️</span>Use this public IP address for the below instructions to check if you're behind CGNAT";
+            statusMessage = "<span class='icon'>✔️</span>Use this public IP address for Step 1 below to check if you're behind CGNAT";
             statusClass = "green";
             noteElement.textContent = "Note: Public-looking IPs may still have restrictions by your ISP that block inbound connections.";
           }
