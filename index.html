@@ -177,7 +177,7 @@
         // Check organization name for mobile keywords
         if (data.org && mobileKeywords.some(keyword => data.org.includes(keyword))) {
           // If organization contains "Fiber" or "Fixed", it's not cellular
-          if (data.org.includes("Fiber") || data.org.includes("Fixed")) {
+          if (org.includes("fios") || org.includes("fiber") || (org.includes("fixed") && !org.includes("wireless"))) {
             return false; // Fixed-line network
           }
           return true; // Cellular network
