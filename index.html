@@ -267,13 +267,16 @@
           "https://v6.ident.me",
           "https://ipv6.icanhazip.com"
         ], isIPv6, "IPv6");
-        const [publicIPv4, publicIPv6] = await Promise.all([ipv4Promise, ipv6Promise]);
+        // IPv4 is the primary result. Do not delay it while IPv6-only
+        // endpoints time out on networks without IPv6 connectivity.
+        const publicIPv4 = await ipv4Promise;
+        let publicIPv6 = null;
 
         const resultElement = document.getElementById('result');
         const noteElement = document.getElementById('note');
         let statusMessage = "";
         let statusClass = "";
-        const ipMessage = `IPv4: ${publicIPv4 || "Not available"}<br>IPv6: ${publicIPv6 || "Not available"}`;
+        const ipMessage = `IPv4: ${publicIPv4 || "Not available"}<br>IPv6: <span id="ipv6-result">Checking…</span>`;
 
         if (publicIPv4) {
           statusMessage = "<span class='icon'>✔️</span>Use this IP address for Step 1 below to check if you're behind CGNAT";
@@ -305,6 +308,12 @@
         if (checkingElement) checkingElement.remove();
         resultElement.innerHTML = `<div class="status ${statusClass}">${statusMessage}</div>
         <div class="ip">${ipMessage}</div>`;
+
+        ipv6Promise.then(address => {
+          publicIPv6 = address;
+          const ipv6Element = document.getElementById("ipv6-result");
+          if (ipv6Element) ipv6Element.textContent = publicIPv6 || "Not available";
+        });
       } catch (error) {
         document.getElementById('result').textContent = 'Error: Unable to check your connection.';
         console.error('Error checking IP:', error);
