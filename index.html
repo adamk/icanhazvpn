@@ -62,6 +62,11 @@
       text-align: left;
     }
 
+    .checklist {
+      list-style: none;
+      padding-left: 0;
+    }
+
     li {
       font-size: 1.1em;
     }
@@ -121,7 +126,7 @@
   </div>
   <br>
   <h2>VPN Hosting Checklist</h2>
-  <ol>
+  <ol class="checklist">
     <li><strong class="step-title">Step 1: Check if you're behind CGNAT (if yes, <a href="https://thewirednomad.com/vpn">host a Tailscale exit node</a>)</strong>
       <ul>
         <li>Compare the IP shown on this page with the <strong>WAN</strong> IP in your main router's admin page. If they are
